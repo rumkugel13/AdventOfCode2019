@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 
 namespace AdventOfCode4
@@ -9,8 +10,13 @@ namespace AdventOfCode4
         {
             Console.WriteLine("Hello World!");
 
-            const int min = 271973;
-            const int max = 785961;
+            int min, max;
+            using (StreamReader reader = new StreamReader(File.OpenRead("data.txt")))
+            {
+                var data = reader.ReadToEnd().Split('-');
+                min = int.Parse(data[0]);
+                max = int.Parse(data[1]);
+            }
 
             int count1 = 0, count2 = 0, count3 = 0;
 

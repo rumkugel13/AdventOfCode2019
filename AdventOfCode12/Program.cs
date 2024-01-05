@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace AdventOfCode12
 {
@@ -9,11 +10,19 @@ namespace AdventOfCode12
         {
             Console.WriteLine("Hello World!");
 
-            /* <x=-7, y=-8, z=9>
-             * <x=-12, y=-3, z=-4>
-             * <x=6, y=-17, z=-9>
-             * <x=4, y=-10, z=-6>
-             */
+            Point3D[] moons = new Point3D[4];
+            using (StreamReader streamReader = new StreamReader(File.OpenRead("data.txt")))
+            {
+                int i = 0;
+                while (!streamReader.EndOfStream)
+                {
+                    string line = streamReader.ReadLine();
+                    line = line.Substring(1, line.Length - 2);
+                    var split = line.Split(", ");
+                    moons[i] = new Point3D(long.Parse(split[0].Substring(2)), long.Parse(split[1].Substring(2)), long.Parse(split[2].Substring(2)));
+                    i++;
+                }
+            }
 
             //Point3D[] moons = new Point3D[4];   // test1.1: 10 steps | 2772 steps
             //moons[0] = new Point3D(-1, 0, 2);
@@ -26,12 +35,6 @@ namespace AdventOfCode12
             //moons[1] = new Point3D(5, 5, 10);
             //moons[2] = new Point3D(2, -7, 3);
             //moons[3] = new Point3D(9, -8, -3);
-
-            Point3D[] moons = new Point3D[4];   // initial position
-            moons[0] = new Point3D(-7, -8, 9);
-            moons[1] = new Point3D(-12, -3, -4);
-            moons[2] = new Point3D(6, -17, -9);
-            moons[3] = new Point3D(4, -10, -6);
 
             Point3D[] velocities = new Point3D[4];
             

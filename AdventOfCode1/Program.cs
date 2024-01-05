@@ -11,7 +11,7 @@ namespace AdventOfCode1
 
             long sum = 0;
 
-            using (StreamReader streamReader = new StreamReader(File.OpenRead("testdata.txt")))
+            using (StreamReader streamReader = new StreamReader(File.OpenRead("data.txt")))
             {
                 while (!streamReader.EndOfStream)
                 {

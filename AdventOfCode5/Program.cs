@@ -12,7 +12,7 @@ namespace AdventOfCode5
             int result1 = 0, result2 = 0;
             int[] input;
 
-            using (StreamReader reader = new StreamReader(File.OpenRead("test2.txt")))
+            using (StreamReader reader = new StreamReader(File.OpenRead("data.txt")))
             {
                 var data = reader.ReadToEnd().Split(',');
                 input = new int[data.Length];
