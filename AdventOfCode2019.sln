@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29519.87
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode1", "AdventOfCode1\AdventOfCode1.csproj", "{6740F88D-F6D2-4368-95F5-96D931B84E82}"
 EndProject
@@ -45,7 +45,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode23", "AdventOfC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode24", "AdventOfCode24\AdventOfCode24.csproj", "{0DF35894-96D4-4110-8907-EF580AAF2DFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdventOfCode25", "AdventOfCode25\AdventOfCode25.csproj", "{0B7F287A-EAAE-45F7-8223-B6E089B5936B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode25", "AdventOfCode25\AdventOfCode25.csproj", "{0B7F287A-EAAE-45F7-8223-B6E089B5936B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode18", "AdventOfCode18\AdventOfCode18.csproj", "{6988BC93-9726-416D-9AA9-BDE9E1938E94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -141,6 +143,10 @@ Global
 		{0B7F287A-EAAE-45F7-8223-B6E089B5936B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B7F287A-EAAE-45F7-8223-B6E089B5936B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B7F287A-EAAE-45F7-8223-B6E089B5936B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6988BC93-9726-416D-9AA9-BDE9E1938E94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6988BC93-9726-416D-9AA9-BDE9E1938E94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6988BC93-9726-416D-9AA9-BDE9E1938E94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6988BC93-9726-416D-9AA9-BDE9E1938E94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
