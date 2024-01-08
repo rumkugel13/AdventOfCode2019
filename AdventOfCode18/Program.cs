@@ -1,24 +1,95 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.IO;
-using System.Net.Sockets;
-using System.Text;
-using System.Xml;
 
 namespace AdventOfCode18
 {
     internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
 
             var input = File.ReadAllLines("data.txt");
-            Dictionary<Point, char> pointsOfInterest = new Dictionary<Point, char>();
+            Dictionary<Point, char> pointsOfInterest = GetPointsOfInterest(input);
 
+            Dictionary<char, List<DistanceItem>> distances = new Dictionary<char, List<DistanceItem>>();
+            foreach (var poi in pointsOfInterest)
+            {
+                if (char.IsUpper(poi.Value))
+                    continue;
+                distances[poi.Value] = FindDistances(input, pointsOfInterest, poi.Key);
+            }
+
+            int minSteps = ShortestPath(distances, new char[] { '@' });
+            Console.WriteLine(minSteps);
+
+            var part2 = MakePart2(input);
+
+            //part2 = new string[]
+            //{
+            //    "#######",
+            //    "#a.#Cd#",
+            //    "##1#2##",
+            //    "#######",
+            //    "##3#4##",
+            //    "#cB#Ab#",
+            //    "#######",
+            //};
+
+            //part2 = new string[]
+            //{
+            //    "###############",
+            //    "#d.ABC.#.....a#",
+            //    "######1#2######",
+            //    "###############",
+            //    "######3#4######",
+            //    "#b.....#.....c#",
+            //    "###############",
+            //};
+
+            //part2 = new string[]
+            //{
+            //    "#############",
+            //    "#DcBa.#.GhKl#",
+            //    "#.###1#2#I###",
+            //    "#e#d#####j#k#",
+            //    "###C#3#4###J#",
+            //    "#fEbA.#.FgHi#",
+            //    "#############",
+            //};
+
+            //part2 = new string[]
+            //{
+            //    "#############",
+            //    "#g#f.D#..h#l#",
+            //    "#F###e#E###.#",
+            //    "#dCba1#2BcIJ#",
+            //    "#############",
+            //    "#nK.L3#4G...#",
+            //    "#M###N#H###.#",
+            //    "#o#m..#i#jk.#",
+            //    "#############",
+            //};
+
+            Dictionary<Point, char> pointsOfInterest2 = GetPointsOfInterest(part2);
+
+            Dictionary<char, List<DistanceItem>> distances2 = new Dictionary<char, List<DistanceItem>>();
+            foreach (var poi in pointsOfInterest2)
+            {
+                if (char.IsUpper(poi.Value))
+                    continue;
+                distances2[poi.Value] = FindDistances(part2, pointsOfInterest2, poi.Key);
+            }
+
+            int minSteps2 = ShortestPath(distances2, new char[] { '1', '2', '3', '4' });
+            Console.WriteLine(minSteps2);
+        }
+
+        private static Dictionary<Point, char> GetPointsOfInterest(string[] input)
+        {
+            Dictionary<Point, char> pointsOfInterest = new Dictionary<Point, char>();
             for (int row = 0; row < input.Length; row++)
             {
                 for (int col = 0; col < input[row].Length; col++)
@@ -30,27 +101,55 @@ namespace AdventOfCode18
                     }
                 }
             }
-
-            Dictionary<char, Dictionary<char, DistanceItem>> distances = new Dictionary<char, Dictionary<char, DistanceItem>>();
-            foreach (var key in pointsOfInterest.Keys)
-            {
-                if (char.IsUpper(pointsOfInterest[key]))
-                    continue;
-                distances[pointsOfInterest[key]] = FindDistances(input, pointsOfInterest, key);
-            }
-
-            int minSteps = ShortestPath(distances);
-            Console.WriteLine(minSteps);
+            return pointsOfInterest;
         }
 
-        static int ShortestPath(Dictionary<char, Dictionary<char, DistanceItem>> distances)
+        private static string[] MakePart2(string[] input)
+        {
+            string[] newMap = (string[])input.Clone();
+
+            Point point = new Point();
+            for (int row = 0; row < input.Length; row++)
+            {
+                for (int col = 0; col < input[row].Length; col++)
+                {
+                    if (input[row][col] == '@')
+                    {
+                        point = new Point(col, row);
+                        break;
+                    }
+                }
+            }
+
+            var centerLine = input[point.Y].ToCharArray();
+            centerLine[point.X - 1] = '#';
+            centerLine[point.X] = '#';
+            centerLine[point.X + 1] = '#';
+            newMap[point.Y] = new string(centerLine);
+
+            char index = '1';
+            var upperLine = input[point.Y - 1].ToCharArray();
+            upperLine[point.X - 1] = index++;
+            upperLine[point.X] = '#';
+            upperLine[point.X + 1] = index++;
+            newMap[point.Y - 1] = new string(upperLine);
+            var lowerLine = input[point.Y + 1].ToCharArray();
+            lowerLine[point.X - 1] = index++;
+            lowerLine[point.X] = '#';
+            lowerLine[point.X + 1] = index++;
+            newMap[point.Y + 1] = new string(lowerLine);
+
+            return newMap;
+        }
+
+        private static int ShortestPath(Dictionary<char, List<DistanceItem>> distances, char[] start)
         {
             int result = int.MaxValue;
             Dictionary<string, int> totalDistances = new Dictionary<string, int>();
             //Queue<State> queue = new Queue<State>();
-            //queue.Enqueue(new State() { Character = '@', visited = new HashSet<char>() });
+            //queue.Enqueue(new State() { Character = start, visited = new HashSet<char>() });
             BucketHeap<State> queue = new BucketHeap<State> { buckets = new Dictionary<int, List<State>>() };
-            queue.Insert(new State() { Character = '@', visited = new HashSet<char>() }, 0);
+            queue.Insert(new State() { Robots = start, KeysFound = new HashSet<char>() }, 0);
 
             while (queue.HasBuckets())
             //while (queue.Count > 0)
@@ -58,18 +157,18 @@ namespace AdventOfCode18
                 //var currentState = queue.Dequeue();
                 var currentState = queue.PopMin();
 
-                if (currentState.visited.Count == distances.Count - 1)
+                if (currentState.KeysFound.Count == distances.Count - start.Length)
                 {
                     result = Math.Min(result, currentState.Distance);
                     //Console.WriteLine(currentState.Distance);
                     break;
                 }
 
-                var currentKey = new List<char>(currentState.visited);
-                currentKey.Remove(currentState.Character);
+                var currentKey = new List<char>(currentState.KeysFound);
                 currentKey.Sort();
-                currentKey.Add(currentState.Character);
+                currentKey.AddRange(currentState.Robots);
                 var stringKey = new string(currentKey.ToArray());
+
                 if (totalDistances.TryGetValue(stringKey, out int value) && value <= currentState.Distance)
                 {
                     continue;
@@ -79,66 +178,60 @@ namespace AdventOfCode18
                     totalDistances[stringKey] = currentState.Distance;
                 }
 
-                foreach (var distanceItem in distances[currentState.Character])
+                for (int i = 0; i < start.Length; i++)
                 {
-                    var character = distanceItem.Value.Character;
-
-                    if (currentState.visited.Contains(character))
+                    foreach (var distanceItem in distances[currentState.Robots[i]])
                     {
+                        var character = distanceItem.Character;
+
+                        if (currentState.KeysFound.Contains(character))
+                        {
+                            continue;
+                        }
+
+                        foreach (char door in distanceItem.Doors)
+                        {
+                            if (!currentState.KeysFound.Contains(char.ToLower(door)))
+                            {
+                                goto outerContinue;
+                            }
+                        }
+
+                        HashSet<char> nextKeyFound = new HashSet<char>(currentState.KeysFound) { character };
+                        char[] nextRobots = (char[])currentState.Robots.Clone();
+                        nextRobots[i] = character;
+
+                        var newState = new State() { Robots = nextRobots, KeysFound = nextKeyFound, Distance = currentState.Distance + distanceItem.Distance };
+                        //queue.Enqueue(newState);
+                        queue.Insert(newState, newState.Distance);
+
+                    outerContinue:
                         continue;
                     }
-
-                    foreach (char door in distanceItem.Value.Doors)
-                    {
-                        if (!currentState.visited.Contains(char.ToLower(door)))
-                        {
-                            goto outerContinue;
-                        }
-                    }
-
-                    HashSet<char> visited2 = new HashSet<char>(currentState.visited) { character };
-                    //Console.WriteLine(string.Join("\t", visited2));
-
-                    var newState = new State() { Character = character, visited = visited2, Distance = currentState.Distance + distanceItem.Value.Distance };
-                    //queue.Enqueue(newState);
-                    queue.Insert(newState, newState.Distance);
-
-                outerContinue:
-                    continue;
                 }
             }
 
             return result;
         }
 
-        struct Seen
+        private struct State
         {
-            public char Character;
-            public string visited;
-        }
-
-        struct State
-        {
-            public char Character;
-            public HashSet<char> visited;
-            public string key;
+            public char[] Robots;
+            public HashSet<char> KeysFound;
             public int Distance;
         }
 
-        struct DistanceItem
+        private struct DistanceItem
         {
             public int Distance;
             public char Character;
             public List<char> Doors;
         }
 
-        static Dictionary<char, DistanceItem> FindDistances(string[] map, Dictionary<Point, char> pointsOfInterest, Point start)
+        private static List<DistanceItem> FindDistances(string[] map, Dictionary<Point, char> pointsOfInterest, Point start)
         {
-            Dictionary<char, DistanceItem> distances = new Dictionary<char, DistanceItem>();
-            HashSet<Point> visited = new HashSet<Point>
-            {
-                start
-            };
+            List<DistanceItem> distances = new List<DistanceItem>();
+            HashSet<Point> visited = new HashSet<Point> { start };
 
             Queue<QueueItem> queue = new Queue<QueueItem>();
             queue.Enqueue(new QueueItem(start, 0));
@@ -160,45 +253,45 @@ namespace AdventOfCode18
                     var item = new QueueItem(newPoint, current.Distance + 1);
                     item.Doors.UnionWith(current.Doors);
 
-                    if (pointsOfInterest.ContainsKey(newPoint))
+                    if (pointsOfInterest.TryGetValue(newPoint, out char character))
                     {
-                        DistanceItem d = new DistanceItem();
-                        d.Distance = item.Distance;
-                        d.Character = pointsOfInterest[newPoint];
-                        d.Doors = new List<char>(item.Doors);
-                        if (char.IsUpper(pointsOfInterest[newPoint]))
-                            item.Doors.Add(pointsOfInterest[newPoint]);
-                        else if (pointsOfInterest[newPoint] != '@')
-                            distances[pointsOfInterest[newPoint]] = d;
+                        DistanceItem d = new DistanceItem
+                        {
+                            Distance = item.Distance,
+                            Character = character,
+                            Doors = new List<char>(item.Doors)
+                        };
+                        if (char.IsUpper(character))
+                            item.Doors.Add(character);
+                        else if (!"@1234".Contains(character))
+                            distances.Add(d);
                     }
-                    //else
-                    {
-                        queue.Enqueue(item);
-                    }
+
+                    queue.Enqueue(item);
                 }
             }
 
             return distances;
         }
 
-        struct QueueItem
+        private struct QueueItem
         {
             public Point Point;
             public int Distance;
             public HashSet<char> Doors;
 
-            public QueueItem(Point point, int v)
+            public QueueItem(Point point, int distance)
             {
                 Point = point;
-                Distance = v;
+                Distance = distance;
                 Doors = new HashSet<char>();
             }
         }
 
-        struct BucketHeap<T>
+        private struct BucketHeap<T>
         {
             public Dictionary<int, List<T>> buckets;
-            int minBucket;
+            private int minBucket;
 
             public bool HasBuckets()
             {
