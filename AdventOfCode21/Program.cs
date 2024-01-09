@@ -14,6 +14,9 @@ namespace AdventOfCode21
             string input = "NOT A J\nNOT B T\nOR T J\nNOT C T\nOR T J\nAND D J\nWALK";
             Run(input);
 
+            input = "OR A T\nAND B T\nAND C T\nNOT T J\nAND D J\nNOT H T\nNOT T T\nOR E T\nAND T J\nRUN";
+            Run(input);
+
             Console.ReadKey();
         }
 
