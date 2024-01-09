@@ -30,48 +30,86 @@ namespace AdventOfCode20
 
             var labelToPortals = LabelToPortals(pointsOfInterest);
 
-            int steps = CountSteps(input, pointsOfInterest, labelToPortals, start, end);
+            int steps = CountSteps(input, pointsOfInterest, labelToPortals, start, end, false);
+            Console.WriteLine(steps);
+            steps = CountSteps(input, pointsOfInterest, labelToPortals, start, end, true);
             Console.WriteLine(steps);
         }
 
-        private static int CountSteps(string[] input, Dictionary<Point, string> pointsOfInterest, Dictionary<string, Point[]> labelsToPortals, Point start, Point end)
+        private static int CountSteps(string[] input, Dictionary<Point, string> pointsOfInterest, Dictionary<string, Point[]> labelsToPortals, Point start, Point end, bool part2)
         {
             int result = int.MaxValue;
-            Dictionary<Point, int> visited = new Dictionary<Point, int>();
-            Queue<(Point, int, string)> queue = new Queue<(Point, int, string)>();
-            queue.Enqueue((start, 0, "AA->"));
+            Dictionary<(Point, int), int> visited = new Dictionary<(Point, int), int>();
+            Queue<(Point, int, int, string)> queue = new Queue<(Point, int, int, string)>();
+            queue.Enqueue((start, 0, 0, "AA->"));
 
             while (queue.Count > 0)
             {
-                var (currentPos, currentDist, path) = queue.Dequeue();
+                var (currentPos, currentLayer, currentDist, path) = queue.Dequeue();
 
-                if (currentPos == end)
+                if (currentPos == end && currentLayer == 0)
                 {
-                    Console.WriteLine(path + "ZZ" + currentDist);
+                    //Console.WriteLine(path + "ZZ" + currentDist);
                     result = Math.Min(result, currentDist);
-                    continue;
+                    if (part2)
+                        break;
+                    else
+                        continue;
                 }
+                visited[(currentPos, currentLayer)] = currentDist;
 
                 foreach (var dir in new Point[] {new Point(0,-1),  new Point(1,0), new Point(0,1),  new Point(-1,0)})
                 {
                     Point nextPoint = new Point(currentPos.X + dir.X, currentPos.Y + dir.Y);
                     string nextPath = path;
                     int nextDist = currentDist;
+                    int nextLayer = currentLayer;
 
-                    if (input[nextPoint.Y][nextPoint.X] != '.' || (visited.TryGetValue(nextPoint, out int dist) && dist < currentDist + 1))
+                    if (input[nextPoint.Y][nextPoint.X] != '.' || (visited.TryGetValue((nextPoint, nextLayer), out int dist) && dist < currentDist + 1))
                     {
                         continue;
                     }
 
+                    //visited[(nextPoint, nextLayer)] = nextDist + 1;
                     if (pointsOfInterest.TryGetValue(nextPoint, out string label) && labelsToPortals.ContainsKey(label))
                     {
-                        nextPoint = labelsToPortals[label][0] == nextPoint ? labelsToPortals[label][1] : labelsToPortals[label][0];
-                        nextDist++;
-                        nextPath += label + "->";
+
+                        if (part2)
+                        {
+                            if (nextPoint.X == 2 || nextPoint.Y == 2 || nextPoint.X == input[0].Length - 3 || nextPoint.Y == input.Length - 3)
+                            {
+                                // outer
+                                if (nextLayer > 0)
+                                {
+                                    nextLayer--;
+                                    nextPoint = labelsToPortals[label][0] == nextPoint ? labelsToPortals[label][1] : labelsToPortals[label][0];
+                                    nextDist++;
+                                    nextPath += label + "->";
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                // inner
+                                nextLayer++;
+                                nextPoint = labelsToPortals[label][0] == nextPoint ? labelsToPortals[label][1] : labelsToPortals[label][0];
+                                nextDist++;
+                                nextPath += label + "->";
+                            }
+                        }
+                        else
+                        {
+                            nextPoint = labelsToPortals[label][0] == nextPoint ? labelsToPortals[label][1] : labelsToPortals[label][0];
+                            nextDist++;
+                            nextPath += label + "->";
+                        }
                     }
 
-                    visited[nextPoint] = nextDist + 1;
-                    queue.Enqueue((nextPoint, nextDist + 1, nextPath));
+                    //visited[(nextPoint, nextLayer)] = nextDist + 1;
+                    queue.Enqueue((nextPoint, nextLayer, nextDist + 1, nextPath));
                 }
             }
 
