@@ -1,5 +1,5 @@
 # Advent Of Code 2019
-This project includes solutions for most of the [AdventOfCode](https://adventofcode.com/2019) challenges.
+This project includes solutions for most of the [AdventOfCode 2019](https://adventofcode.com/2019) challenges.
 
 All of the projects are built in C# using the dotnet core runtime.
 Note: Until day 8 i didn't know what LINQ was, our how to use it. 
